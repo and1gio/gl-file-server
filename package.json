@@ -1,6 +1,6 @@
 {
-  "name": "gl-file-rerver-api",
-  "description": "GL File Server API",
+  "name": "z-file-rerver-api",
+  "description": "Z File Server API",
   "version": "0.0.1",
   "private": true,
   "scripts": {

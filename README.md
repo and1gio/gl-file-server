@@ -1,2 +1,2 @@
-# gl-file-server
-GL File Server Api
+# z-file-server
+Z File Server Api
