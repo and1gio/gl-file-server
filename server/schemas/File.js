@@ -9,6 +9,7 @@ module.exports = function (app) {
         storageId: {type: ObjectId, required: true},
         path: {type: String, required: true},
         mimeType: {type: String, default: null},
+        encoding: {type: String, default: null},
         filePath: {type: String, required: true},
         size: {type: Number, required: true},
         key: {type: String, default: null},

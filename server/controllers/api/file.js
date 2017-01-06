@@ -1,5 +1,4 @@
 module.exports = function (app) {
-
     var bl = {};
 
     var gm = require('gm').subClass({imageMagick: true});
@@ -10,16 +9,24 @@ module.exports = function (app) {
     var createOutputStream = require('create-output-stream');
     var diskspace = require('diskspace');
 
-    var fileType = require('file-type');
     var path = require('path');
 
     var ReadableStreamClone = require('readable-stream-clone');
+
+    var mime = require('mime-types');
 
     bl.save = function (req, cb) {
         app.logger.winston.log('info', 'params', req.body);
 
         var key = req.body.key;
+
+        var originalName = req.body.originalName;
+        var mimeType = req.body.mimeType;
+        var size = req.body.size;
+        var encoding = req.body.encoding;
+
         var file = req.file;
+
 
         app.logger.winston.log('info', 'params', file);
 
@@ -49,7 +56,13 @@ module.exports = function (app) {
 
                 var folder = generateFilePathById(id);
                 var filePath = storage.path + folder;
-                var fileNameInTheFileSystem = id.toString();
+
+                var ext = mime.extension(mimeType || file.mimetype);
+                if(!ext){
+                    return cb([{ keyword: 'UNKNOWN_EXTENSION'}], null);
+                }
+
+                var fileNameInTheFileSystem = id.toString() + "." + ext;
 
                 var writeStream = createOutputStream(filePath + fileNameInTheFileSystem);
 
@@ -58,25 +71,22 @@ module.exports = function (app) {
                 writeStream.on('finish', function () {
                     fse.unlink(file.path);
 
-                    if (file.mimetype === "false") {
-                        file.mimetype = null;
-                    }
-
                     var fileDB = new app.db.models.File({
                         _id: id,
                         storageId: storage._id,
-                        originalName: file.originalname,
-                        name: file.filename,
-                        mimeType: file.mimetype || null,
+                        originalName: originalName || file.originalname,
+                        name: fileNameInTheFileSystem,
+                        mimeType: mimeType || file.mimetype,
+                        encoding: encoding || file.encoding,
                         filePath: storage._id.toString() + id.toString(),
-                        size: file.size,
+                        size: size || file.size,
                         path: folder,
                         key: key
                     });
-                    fileDB.save(function (err, res) {
-                        console.log(err, res, "<<<<<<");
+
+                    fileDB.save(function (err) {
                         if (err) {
-                            return cb(app.errorsClient.getError(['ERROR_WHILE_SAVE_FILE_IN_DATABASE']), null);
+                            return cb([{ keyword: 'ERROR_WHILE_SAVE_FILE_IN_DATABASE'}], null);
                         }
 
                         cb(null, fileDB);
@@ -146,6 +156,8 @@ module.exports = function (app) {
             }
 
             var metaData = res.data.metaData;
+
+            console.log(metaData, "?????????");
             var filePath = res.data.filePath;
 
             var transformedFilePath = filePath +
@@ -176,13 +188,29 @@ module.exports = function (app) {
         });
     };
 
+    bl.getMeta = function (req, cb) {
+        app.logger.winston.log('info', 'params', req);
+
+        var fileId = req.body.fileId;
+        var key = req.body.key || null;
+
+        if (!fileId) {
+            return cb({keyword: "FILE_ID_REQUIRED"}, null);
+        }
+
+
+        getFileInfo(fileId, key, function (err, data) {
+            return cb(err, data);
+        });
+    };
+
     /**
      * Local Methods
      */
     function checkStorageForFreeSpace(storages, fileSize, index, cb) {
         var currStorage = storages[index];
         if (!currStorage) {
-            return cb(app.errorsClient.getError(['STORAGE_HAS_NOT_FREE_SPACE']), null);
+            return cb([{ keyword: 'STORAGE_HAS_NOT_FREE_SPACE'}], null);
         }
 
         diskspace.check(currStorage.path, function (err, total, free, status) {
@@ -205,18 +233,18 @@ module.exports = function (app) {
 
             var storage = app.store.storage[storageId];
             if (!storage) {
-                return cb(app.errorsClient.getError(['STORAGE_NOT_FOUND']), null);
+                return cb([{ keyword: 'STORAGE_NOT_FOUND'}], null);
             }
 
             // TODO - i think this is bug! will check lately
             if (!storage.readActive) {
-                return cb(app.errorsClient.getError(['STORAGE_IS_NOT_READABLE']), null);
+                return cb([{ keyword: 'STORAGE_IS_NOT_READABLE'}], null);
             }
 
             var filePath = generateFilePathById(fileId);
             cb(null, {
                 data: {
-                    filePath: storage.path + filePath + fileId,
+                    filePath: storage.path + filePath + metaData.name,
                     metaData: metaData
                 }
             });
@@ -276,7 +304,7 @@ module.exports = function (app) {
 
         gm(imageFilePath).size(function (err, res) {
             if (err) {
-                return cb(app.errorsClient.getError(['ERROR_WHILE_TRANSFORM_IMAGE']), null);
+                return cb([{ keyword: 'ERROR_WHILE_TRANSFORM_IMAGE'}], null);
             }
 
             var image = gm(imageFilePath);
@@ -302,7 +330,7 @@ module.exports = function (app) {
 
             image.stream(function (err, stdout, stderr) {
                 if (err) {
-                    return cb(app.errorsClient.getError(['ERROR_WHILE_STREAM_IMAGE_BACK']), null);
+                    return cb([{ keyword: 'ERROR_WHILE_STREAM_IMAGE_BACK'}], null);
                 }
                 cb(null, {stream: stdout});
             });
