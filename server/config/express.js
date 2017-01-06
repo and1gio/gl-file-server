@@ -1,7 +1,7 @@
 exports.default = function (app) {
     return {
         express: {
-            port: 5005
+            port: 3050
         }
     }
 };
@@ -9,7 +9,7 @@ exports.default = function (app) {
 exports.staging = function (app) {
     return {
         express: {
-            port: 5005
+            port: 3050
         }
     }
 };
@@ -17,7 +17,7 @@ exports.staging = function (app) {
 exports.production = function (app) {
     return {
         express: {
-            port: 5005
+            port: 3050
         }
     }
 };
