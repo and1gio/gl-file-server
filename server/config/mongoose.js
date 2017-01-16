@@ -4,7 +4,7 @@
 exports.default = function (app) {
     return {
         mongoose: {
-            uri: 'mongodb://192.168.1.183:27017/fileServer'
+            uri: 'mongodb://192.168.1.183:27017/fileServer2'
         }
     }
 };
@@ -15,7 +15,7 @@ exports.default = function (app) {
 exports.staging = function (app) {
     return {
         mongoose: {
-            uri: 'mongodb://192.168.1.183:27017/fileServer'
+            uri: 'mongodb://192.168.1.183:27017/fileServer2'
         }
     }
 };
@@ -26,7 +26,7 @@ exports.staging = function (app) {
 exports.production = function (app) {
     return {
         mongoose: {
-            uri: 'mongodb://192.168.1.183:27017/fileServer'
+            uri: 'mongodb://192.168.1.183:27017/fileServer2'
         }
     }
 };

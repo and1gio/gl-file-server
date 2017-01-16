@@ -14,9 +14,11 @@ module.exports = function (app) {
     var ReadableStreamClone = require('readable-stream-clone');
 
     var mime = require('mime-types');
+    var utf8 = require('utf8');
 
     bl.save = function (req, cb) {
         app.logger.winston.log('info', 'params', req.body);
+        app.logger.winston.log('info', 'file', req.file);
 
         var key = req.body.key;
 
@@ -26,9 +28,6 @@ module.exports = function (app) {
         var encoding = req.body.encoding;
 
         var file = req.file;
-
-
-        app.logger.winston.log('info', 'params', file);
 
         // TODO - we have to replace this with gl-params-validator module
         var errorKeywords = [];

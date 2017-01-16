@@ -6,7 +6,7 @@ module.exports = function (app) {
 
         res.json({
             result: {
-                error: err
+                errors: err
             }
         });
     });
