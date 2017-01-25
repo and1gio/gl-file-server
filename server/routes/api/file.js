@@ -15,8 +15,10 @@ module.exports = function (app) {
             if (errors) {
                 next(errors);
             } else {
+                //res.set('content-type', data.metaData.mimeType);
+                //res.set('original-name', new Buffer(data.metaData.originalName).toString('base64'));
                 res.set('content-type', data.metaData.mimeType);
-                res.set('original-name', new Buffer(data.metaData.originalName).toString('base64'));
+                res.set('original-name', data.metaData.originalName);
                 data.stream.pipe(res);
             }
         });
@@ -27,8 +29,10 @@ module.exports = function (app) {
             if (errors) {
                 next(errors);
             } else {
+                //res.set('content-type', data.metaData.mimeType);
+                //res.set('original-name', new Buffer(data.metaData.originalName).toString('base64'));
                 res.set('content-type', data.metaData.mimeType);
-                res.set('original-name', new Buffer(data.metaData.originalName).toString('base64'));
+                res.set('original-name', data.metaData.originalName);
                 data.stream.pipe(res);
             }
         });
