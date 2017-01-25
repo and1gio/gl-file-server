@@ -16,6 +16,10 @@ module.exports = function (app) {
     var mime = require('mime-types');
     var utf8 = require('utf8');
 
+    var customMimeTypes = {
+
+    };
+
     bl.save = function (req, cb) {
         app.logger.winston.log('info', 'params', req.body);
         app.logger.winston.log('info', 'file', req.file);
@@ -56,7 +60,13 @@ module.exports = function (app) {
                 var folder = generateFilePathById(id);
                 var filePath = storage.path + folder;
 
-                var ext = mime.extension(mimeType || file.mimetype);
+                var re = /(?:\.([^.]+))?$/;
+                var ext = re.exec(originalName || file.originalname)[1];
+
+                if(!ext){
+                    ext = mime.extension(mimeType || file.mimetype);
+                }
+
                 if(!ext){
                     return cb([{ keyword: 'UNKNOWN_EXTENSION'}], null);
                 }
