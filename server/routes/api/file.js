@@ -1,7 +1,7 @@
 module.exports = function (app) {
 
     var multer = require('multer');
-    var upload = multer({limits: {fileSize: 300000000}, dest: 'tempFiles/'}); // max 300mb - strange
+    var upload = multer({limits: {fileSize: 314572800}, dest: 'tempFiles/'}); // max 300mb - strange
 
     app.router.post('/save', upload.single('file'), function (req, res, next) {
         app.apiBL.file.save(req, function (errors, data) {
