@@ -4,7 +4,7 @@
 exports.default = function (app) {
     return {
         mongoose: {
-            uri: 'mongodb://192.168.1.183:27017/fileServer2'
+            uri: 'mongodb://192.168.1.183:27017/fileServer'
         }
     }
 };
