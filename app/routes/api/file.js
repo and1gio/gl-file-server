@@ -14,7 +14,7 @@ module.exports = function (app) {
 
     router.post('/save', upload.single('file'), function (req, res, next) {
         app.zService.file.save(req, function (errors, data) {
-            errors ? next(errors) : res.json({result: {data: [data]}});
+            errors ? next(errors) : res.json({result: {data: data}}); // [data]
         });
     });
 
@@ -23,8 +23,8 @@ module.exports = function (app) {
             if (errors) {
                 next(errors);
             } else {
-                //res.set('content-type', data.metaData.mimeType);
-                //res.set('original-name', data.metaData.originalName);
+                res.set('content-type', data.metaData.mimeType);
+                res.set('original-name', data.metaData.originalName);
                 stream.pipe(res);
             }
         });
