@@ -63,15 +63,17 @@ module.exports = function (app) {
                 var re = /(?:\.([^.]+))?$/;
                 var ext = re.exec(originalName || file.originalname)[1];
 
-                if(!ext){
-                    ext = mime.extension(mimeType || file.mimetype);
-                }
+                //if(!ext){
+                //    ext = mime.extension(mimeType || file.mimetype);
+                //}
 
-                if(!ext){
-                    return cb([{ keyword: 'UNKNOWN_EXTENSION'}], null);
-                }
+                //if(!ext){
+                //    return cb([{ keyword: 'UNKNOWN_EXTENSION'}], null);
+                //}
 
-                var fileNameInTheFileSystem = id.toString() + "." + ext;
+		if(ext){ ext = "."+ext; }
+
+                var fileNameInTheFileSystem = id.toString() + (ext || '');
 
                 var writeStream = createOutputStream(filePath + fileNameInTheFileSystem);
 
@@ -165,8 +167,6 @@ module.exports = function (app) {
             }
 
             var metaData = res.data.metaData;
-
-            console.log(metaData, "?????????");
             var filePath = res.data.filePath;
 
             var transformedFilePath = filePath +

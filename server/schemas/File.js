@@ -23,10 +23,14 @@ module.exports = function (app) {
 
     File.statics.get = function (id, key, cb) {
         this.find({_id: id, recordState: 1, $or: [{key: key}, {key: null}]}, function (err, res) {
-            if (res.length !== 1) {
-                return cb({keyword: 'FILE_WITH_ID_NOT_FOUND'}, null);
-            }
-            cb(null, res[0]);
+		if(err || !res){
+			return cb({keyword: 'FILE_WITH_ID_NOT_FOUND'}, null);
+		}        
+    
+		if (res.length !== 1) {
+                	return cb({keyword: 'FILE_WITH_ID_NOT_FOUND'}, null);
+            	}
+           	cb(null, res[0]);
         });
     };
 
