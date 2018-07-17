@@ -1,7 +1,7 @@
 module.exports = function (app) {
     var bl = {};
 
-    var gm = require('gm').subClass({imageMagick: true});
+    var gm = require('gm').subClass({ imageMagick: true });
 
     var fs = require('fs');
     var fse = require('fs-extra');
@@ -63,15 +63,7 @@ module.exports = function (app) {
                 var re = /(?:\.([^.]+))?$/;
                 var ext = re.exec(originalName || file.originalname)[1];
 
-                //if(!ext){
-                //    ext = mime.extension(mimeType || file.mimetype);
-                //}
-
-                //if(!ext){
-                //    return cb([{ keyword: 'UNKNOWN_EXTENSION'}], null);
-                //}
-
-		if(ext){ ext = "."+ext; }
+                if (ext) { ext = "." + ext; }
 
                 var fileNameInTheFileSystem = id.toString() + (ext || '');
 
@@ -97,7 +89,7 @@ module.exports = function (app) {
 
                     fileDB.save(function (err) {
                         if (err) {
-                            return cb([{ keyword: 'ERROR_WHILE_SAVE_FILE_IN_DATABASE'}], null);
+                            return cb([{ keyword: 'ERROR_WHILE_SAVE_FILE_IN_DATABASE' }], null);
                         }
 
                         cb(null, fileDB);
@@ -177,7 +169,7 @@ module.exports = function (app) {
             fs.exists(transformedFilePath, function (exists) {
                 if (exists) {
                     var stream = fs.createReadStream(transformedFilePath);
-                    return cb(null, {stream: stream, metaData: metaData});
+                    return cb(null, { stream: stream, metaData: metaData });
                 }
 
                 transformImage(filePath, imageTransformParams, function (transformImageError, transformImageResponse) {
@@ -191,7 +183,7 @@ module.exports = function (app) {
                     var writeStream = fs.createWriteStream(transformedFilePath);
                     readableStream.pipe(writeStream);
 
-                    cb(null, {stream: transformImageResponse.stream, metaData: transformImageResponse.metaData});
+                    cb(null, { stream: transformImageResponse.stream, metaData: transformImageResponse.metaData });
                 });
             });
         });
@@ -204,7 +196,7 @@ module.exports = function (app) {
         var key = req.body.key || null;
 
         if (!fileId) {
-            return cb({keyword: "FILE_ID_REQUIRED"}, null);
+            return cb({ keyword: "FILE_ID_REQUIRED" }, null);
         }
 
 
@@ -219,7 +211,7 @@ module.exports = function (app) {
     function checkStorageForFreeSpace(storages, fileSize, index, cb) {
         var currStorage = storages[index];
         if (!currStorage) {
-            return cb([{ keyword: 'STORAGE_HAS_NOT_FREE_SPACE'}], null);
+            return cb([{ keyword: 'STORAGE_HAS_NOT_FREE_SPACE' }], null);
         }
 
         diskspace.check(currStorage.path, function (err, total, free, status) {
@@ -242,12 +234,12 @@ module.exports = function (app) {
 
             var storage = app.store.storage[storageId];
             if (!storage) {
-                return cb([{ keyword: 'STORAGE_NOT_FOUND'}], null);
+                return cb([{ keyword: 'STORAGE_NOT_FOUND' }], null);
             }
 
             // TODO - i think this is bug! will check lately
             if (!storage.readActive) {
-                return cb([{ keyword: 'STORAGE_IS_NOT_READABLE'}], null);
+                return cb([{ keyword: 'STORAGE_IS_NOT_READABLE' }], null);
             }
 
             var filePath = generateFilePathById(fileId);
@@ -266,7 +258,7 @@ module.exports = function (app) {
         });
     }
 
-    var generateFilePathById = function (objectId) {
+    function generateFilePathById (objectId) {
         var id = objectId.toString();
         var path = "";
         for (var i = 0; i < id.length; i += 4) {
@@ -292,15 +284,15 @@ module.exports = function (app) {
         var offsetY = imageSize.height - targetSize.height;
 
         var cropObj = {
-            "TL": {x: 0, y: 0},
-            "TC": {x: offsetX / 2, y: 0},
-            "TR": {x: offsetX, y: 0},
-            "ML": {x: 0, y: offsetY / 2},
-            "MC": {x: offsetX / 2, y: offsetY / 2},
-            "MR": {x: offsetX, y: offsetY / 2},
-            "BL": {x: 0, y: offsetY},
-            "BC": {x: offsetX / 2, y: offsetY},
-            "BR": {x: offsetX, y: offsetY}
+            "TL": { x: 0, y: 0 },
+            "TC": { x: offsetX / 2, y: 0 },
+            "TR": { x: offsetX, y: 0 },
+            "ML": { x: 0, y: offsetY / 2 },
+            "MC": { x: offsetX / 2, y: offsetY / 2 },
+            "MR": { x: offsetX, y: offsetY / 2 },
+            "BL": { x: 0, y: offsetY },
+            "BC": { x: offsetX / 2, y: offsetY },
+            "BR": { x: offsetX, y: offsetY }
         };
 
         return cropObj[crop];
@@ -313,7 +305,7 @@ module.exports = function (app) {
 
         gm(imageFilePath).size(function (err, res) {
             if (err) {
-                return cb([{ keyword: 'ERROR_WHILE_TRANSFORM_IMAGE'}], null);
+                return cb([{ keyword: 'ERROR_WHILE_TRANSFORM_IMAGE' }], null);
             }
 
             var image = gm(imageFilePath);
@@ -339,9 +331,9 @@ module.exports = function (app) {
 
             image.stream(function (err, stdout, stderr) {
                 if (err) {
-                    return cb([{ keyword: 'ERROR_WHILE_STREAM_IMAGE_BACK'}], null);
+                    return cb([{ keyword: 'ERROR_WHILE_STREAM_IMAGE_BACK' }], null);
                 }
-                cb(null, {stream: stdout});
+                cb(null, { stream: stdout });
             });
         });
     }
