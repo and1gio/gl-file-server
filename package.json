@@ -7,13 +7,15 @@
         "start": "node starter.js"
     },
     "dependencies": {
-        "@and1gio/z-app-core": "1.0.0",
-        "connect-multiparty": "2.1.1",
+        "@and1gio/z-app-core": "1.0.1",
+        "connect-multiparty": "2.2.0",
         "create-output-stream": "0.0.1",
         "diskusage": "0.2.4",
+        "file-type": "9.0.0",
         "fs-extra": "7.0.0",
         "gm": "1.23.1",
-        "mongoose": "5.2.4"
+        "mongoose": "5.2.4",
+        "read-chunk": "3.0.0"
     },
     "devDependencies": {}
 }

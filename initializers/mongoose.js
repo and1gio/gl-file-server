@@ -22,11 +22,10 @@ class MongooseInitializer extends Initializer {
             connection: connection,
             models: {
                 File: this._initFileModel(connection),
-                Storage: this._initStorageModel(connection)
+                Storage: this._initStorageModel(connection),
+                Thumbnail: this._initThumbnailModel(connection)
             }
         }
-
-
     }
 
     async _openConnection() {
@@ -46,22 +45,57 @@ class MongooseInitializer extends Initializer {
          * after some period record will be also deleted
          */
         return mongoose.Schema({
-            name: { type: String, required: true, unique: true },
+            fsName: { type: String, required: true, unique: true },
             originalName: { type: String, required: true },
             storageId: { type: ObjectId, required: true },
             mimeType: { type: String, default: null },
             encoding: { type: String, default: null },
             size: { type: Number, required: true },
             key: { type: String, default: null },
-            isCropped: { type: Boolean, default: false },
-            cropedPictures: { type: Mixed },
             createdAt: {
                 type: Date, default: function () {
                     return new Date();
                 }
             },
-            lastReadAt: { type: Date, default: null },
-            recordState: { type: Number, required: true, default: 1 }
+            lastReadAt: {
+                type: Date, default: function () {
+                    return new Date();
+                }
+            },
+            recordState: { type: Number, required: true, default: 0 }
+        });
+    }
+
+    _initThumbnailsSchema() {
+        /**
+         * recordState
+         * 0: draft / uncommited
+         * 1: active / commited
+         * 2: marked to delete
+         * 3: file was deleted by job
+         * after some period record will be also deleted
+         */
+        return mongoose.Schema({
+            originId: { type: ObjectId, required: true },
+            fsName: { type: String, required: true, unique: true }, // {id}_{width}_{height}_{crop}
+            crop: {
+                width: { type: Number, required: false, default: null },
+                height: { type: Number, required: false, default: null },
+                position: { type: String, required: false, default: null },
+            },
+            storageId: { type: ObjectId, required: true },
+            size: { type: Number, required: true },
+            createdAt: {
+                type: Date, default: function () {
+                    return new Date();
+                }
+            },
+            lastReadAt: {
+                type: Date, default: function () {
+                    return new Date();
+                }
+            },
+            recordState: { type: Number, required: true, default: 0 }
         });
     }
 
@@ -88,6 +122,29 @@ class MongooseInitializer extends Initializer {
         };
 
         return FileModel;
+    }
+
+    _initThumbnailModel(connection) {
+        const ThumbnailSchema = this._initThumbnailsSchema();
+        const ThumbnailModel = connection.model('Thumbnail', ThumbnailSchema);
+
+        ThumbnailModel.findByIdAndName = async function (id, name) {
+            return await this.findOne({ originId: id, fsName: name, recordState: { $in: [0, 1] } });
+        };
+
+        ThumbnailModel.findByIdAndCrop = async function (id, crop) {
+            return await this.findOne({
+                originId: id,
+                crop: {
+                    width: crop.width,
+                    height: crop.height,
+                    position: crop.position
+                },
+                recordState: { $in: [0, 1] }
+            });
+        };
+
+        return ThumbnailModel;
     }
 
     _initStorageModel(connection) {
