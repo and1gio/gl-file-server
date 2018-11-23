@@ -118,7 +118,17 @@ class MongooseInitializer extends Initializer {
         const FileModel = connection.model('File', FileSchema);
 
         FileModel.findActive = async function (id, key) {
-            return await this.findOne({ _id: id, recordState: { $in: [0, 1] }, $or: [{ key: key }, { key: null }] });
+            return await this.findOne({
+                $and: [
+                    {
+                        _id: id,
+                        recordState: { $in: [0, 1] }
+                    },
+                    {
+                        $or: [{ key: key }, { key: null }]
+                    }
+                ]
+            });
         };
 
         return FileModel;

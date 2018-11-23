@@ -40,7 +40,11 @@ class FileService extends Service {
             const fileId = req.params.fileId;
 
             const FileModel = this.app.mongodb.models.File;
+
+            console.log(fileId, key);
             const fileMetaData = await FileModel.findActive(fileId, key);
+
+            console.log(fileMetaData)
 
             if (!fileMetaData) {
                 return this.app.utils.handleErrorResponse(404, [{ keyword: 'file_not_found' }], next);

@@ -11,6 +11,7 @@ exports.default = [
     { type: 'core', name: 'validator', enabled: false },
     { type: 'core', name: 'filter', enabled: false },
     { type: 'core', name: 'route', enabled: true },
-    { type: 'core', name: 'http', enabled: true }
+    { type: 'core', name: 'http', enabled: true },
+    { type: 'app', name: 'data-transfer-job', enabled: false },
 ];
 
