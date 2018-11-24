@@ -39,8 +39,10 @@ class DataTransferJobInitializer extends Initializer {
             }, 10000)
 
             const files = await OldFileModel.findNonSynced(10);
-            await this._sync(OldFileModel, NewFileModel, files, 1000);
+            await this._sync(OldFileModel, NewFileModel, files, 10000);
+
             console.log('FINISHED!!!');
+
         }, 5000);
 
 
