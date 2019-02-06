@@ -75,6 +75,7 @@ class DataTransferJobInitializer extends Initializer {
     }
 
     async _sync(OldFileModel, NewFileModel, files, count) {
+        const startTime = new Date().getTime();
         for (let file of files) {
             // TODO do some work
             if (file.originalName || file.name) {
@@ -100,7 +101,8 @@ class DataTransferJobInitializer extends Initializer {
             }
         }
 
-        console.log(count, "part done!!");
+        const diff = new Date().getTime() - startTime;
+        console.log(count, "part done!! in millis: ", diff / 1000);
 
         const nextFiles = await OldFileModel.findNonSynced(count);
         if (nextFiles && nextFiles.length > 0) {
