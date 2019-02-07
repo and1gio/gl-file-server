@@ -30,15 +30,15 @@ class DataTransferJobInitializer extends Initializer {
             const OldFileModel = this.app.dataTransferJob.models.File;
             const NewFileModel = this.app.mongodb.models.File;
 
-            const count = await OldFileModel.countSynced();
+            let count = await OldFileModel.countSynced();
             console.log('Synced: ', count);
 
             setInterval(async () => {
-                const count = await OldFileModel.countSynced();
+                let count = await OldFileModel.countSynced();
                 console.log('Synced: ', count);
             }, 100000)
 
-            const files = await OldFileModel.findNonSynced(10);
+            let files = await OldFileModel.findNonSynced(10);
             await this._sync(OldFileModel, NewFileModel, files, 10000);
 
             console.log('FINISHED!!!');
@@ -75,11 +75,11 @@ class DataTransferJobInitializer extends Initializer {
     }
 
     async _sync(OldFileModel, NewFileModel, files, count) {
-        const startTime = new Date().getTime();
+        let startTime = new Date().getTime();
         for (let file of files) {
             // TODO do some work
             if (file.originalName || file.name) {
-                const newFile = new NewFileModel({
+                let newFile = new NewFileModel({
                     _id: file._id,
                     fsName: file.name,
                     originalName: file.originalName == null || file.originalName == undefined || file.originalName == "" ? file.name : file.originalName,
@@ -104,7 +104,7 @@ class DataTransferJobInitializer extends Initializer {
         const diff = new Date().getTime() - startTime;
         console.log(count, "part done!! in millis: ", diff / 1000);
 
-        const nextFiles = await OldFileModel.findNonSynced(count);
+        let nextFiles = await OldFileModel.findNonSynced(count);
         if (nextFiles && nextFiles.length > 0) {
             console.log("preparing for next part!!");
             await this._sync(OldFileModel, NewFileModel, nextFiles, count);
