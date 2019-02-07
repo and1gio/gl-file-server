@@ -36,13 +36,12 @@ class DataTransferJobInitializer extends Initializer {
             setInterval(async () => {
                 let count = await OldFileModel.countSynced();
                 console.log('Synced: ', count);
-            }, 100000)
+            }, 10000)
 
             let files = await OldFileModel.findNonSynced(10);
             await this._sync(OldFileModel, NewFileModel, files, 10000);
 
             console.log('FINISHED!!!');
-
         }, 5000);
 
 
