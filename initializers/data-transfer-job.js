@@ -1,10 +1,9 @@
 'use strict';
 
 const Initializer = require('@and1gio/z-app-core').Initializer;
-
 const mongoose = require('mongoose');
-
 const ObjectId = mongoose.Schema.Types.ObjectId;
+const schedule = require('node-schedule')
 
 class DataTransferJobInitializer extends Initializer {
 
@@ -33,15 +32,14 @@ class DataTransferJobInitializer extends Initializer {
             let count = await OldFileModel.countSynced();
             console.log('Synced: ', count);
 
-            setInterval(async () => {
-                let count = await OldFileModel.countSynced();
-                console.log('Synced: ', count);
-            }, 30000)
+            schedule.scheduleJob('0 10 * * *', async () => {
+                let count = await OldFileModel.countNonSynced();
+                console.log('Items to sync: ', count);
 
-            let files = await OldFileModel.findNonSynced(1000);
-            await this._sync(OldFileModel, NewFileModel, files, 1000);
+                let files = await OldFileModel.findNonSynced(1000);
+                await this._sync(OldFileModel, NewFileModel, files, 1000);
+            });
 
-            console.log('FINISHED!!!');
         }, 3000);
 
 
@@ -74,6 +72,8 @@ class DataTransferJobInitializer extends Initializer {
     }
 
     async _sync(OldFileModel, NewFileModel, files, count) {
+        console.log("Gonna sync next: ", files.length);
+
         let startTime = new Date().getTime();
         for (let file of files) {
             // TODO do some work
@@ -181,6 +181,19 @@ class DataTransferJobInitializer extends Initializer {
 
         FileModel.countSynced = async function () {
             return await this.countDocuments({ isSynced: true });
+        };
+
+        FileModel.countNonSynced = async function () {
+            return await this.countDocuments({
+                $and: [
+                    {
+                        oldName: null
+                    },
+                    {
+                        $or: [{ isSynced: null }, { isSynced: false }]
+                    }
+                ]
+             });
         };
 
 
