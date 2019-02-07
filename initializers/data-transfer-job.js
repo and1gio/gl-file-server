@@ -32,7 +32,7 @@ class DataTransferJobInitializer extends Initializer {
             let count = await OldFileModel.countSynced();
             console.log('Synced: ', count);
 
-            schedule.scheduleJob('0 10 * * *', async () => {
+            schedule.scheduleJob('*/10 * * * * *', async () => {
                 let count = await OldFileModel.countNonSynced();
                 console.log('Items to sync: ', count);
 
