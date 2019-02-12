@@ -1,5 +1,5 @@
 const Service = require('@and1gio/z-app-core').Service;
-const Handle = requestAnimationFrame('@and1gio/z-app-core').Handle;
+const Handle = require('@and1gio/z-app-core').Handle;
 
 const gm = require('gm').subClass({ imageMagick: true });
 const fs = require('fs');

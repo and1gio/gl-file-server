@@ -1,7 +1,7 @@
 'use strict';
 
 const Middleware = require('@and1gio/z-app-core').Middleware;
-const Handle = requestAnimationFrame('@and1gio/z-app-core').Handle;
+const Handle = require('@and1gio/z-app-core').Handle;
 
 class ErrorHandler extends Middleware {
     constructor(app) {
