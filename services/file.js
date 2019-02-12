@@ -29,6 +29,7 @@ class FileService extends Service {
                 return this.app.utils.handleErrorResponse(400, [{ keyword: 'FILE_REQUIRED' }], next);
             }
 
+            console.log(file)
             const record = await this._saveFile(file, key);
 
             // TEMPORARY - Remove after we completly move to new FS Storage Server
@@ -457,11 +458,13 @@ class FileService extends Service {
     }
 
     _saveFileOnDisk(file, fileFullPath) {
+        console.log(fileFullPath);
         return new Promise(async (resolve, reject) => {
             const writeStream = createOutputStream(fileFullPath);
             fse.createReadStream(file.path).pipe(writeStream);
             writeStream
-                .on('error', async () => {
+                .on('error', async (error) => {
+                    console.log(error)
                     fse.unlink(file.path);
                     reject(this.app.utils.createError(400, [{ keyword: 'ERROR_WHILE_SAVING_FILE_ON_STORAGE' }]));
                 })
