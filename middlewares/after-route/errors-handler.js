@@ -1,6 +1,7 @@
 'use strict';
 
 const Middleware = require('@and1gio/z-app-core').Middleware;
+const Handle = requestAnimationFrame('@and1gio/z-app-core').Handle;
 
 class ErrorHandler extends Middleware {
     constructor(app) {
@@ -11,21 +12,9 @@ class ErrorHandler extends Middleware {
 
     handler(ex, req, res, next) {
         this.app.logger.error("******* ERROR-HANDLER *******", ex);
-
-        if (ex && ex.error && ex.error.code) {
-            res.status(ex.error.code).json(ex);
-        } else {
-            res.status(500).json({
-                success: false,
-                error: {
-                    code: 500,
-                    errors: [{
-                        keyword: 'INTERNAL_SERVER_ERROR',
-                        message: 'INTERNAL_SERVER_ERROR'
-                    }]
-                }
-            });
-        }
+        res.status(500).json({
+            errors: [{ keyword: 'internal_server_error' }]
+        });
     }
 }
 

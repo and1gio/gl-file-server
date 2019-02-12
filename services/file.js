@@ -1,4 +1,5 @@
 const Service = require('@and1gio/z-app-core').Service;
+const Handle = requestAnimationFrame('@and1gio/z-app-core').Handle;
 
 const gm = require('gm').subClass({ imageMagick: true });
 const fs = require('fs');
@@ -7,9 +8,10 @@ const fileType = require('file-type');
 const readChunk = require('read-chunk');
 
 const diskusage = require('diskusage');
-var createOutputStream = require('create-output-stream');
+const createOutputStream = require('create-output-stream');
 
 const path = require('path');
+
 
 class FileService extends Service {
 
@@ -31,6 +33,44 @@ class FileService extends Service {
             return this.app.utils.handleSuccessResponse(record, res);
         } catch (error) {
             next(error);
+        }
+    }
+
+    async saveAndCommit(req, res, next) {
+        try {
+            const key = req.body.key;
+            const file = req.files.file;
+
+            // TODO - change with validate module
+            if (!file) {
+                return this.app.utils.handleErrorResponse(400, [{ keyword: 'FILE_REQUIRED' }], next);
+            }
+
+            const record = await this._saveFile(file, key, true);
+            return this.app.utils.handleSuccessResponse(record, res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async commit(req, res, next) {
+        try {
+            const key = req.headers.key || 'Joni'; // TODO .. test remove
+            const fileId = req.params.fileId;
+
+            const FileModel = this.app.mongodb.models.File;
+            const fileMetaData = await FileModel.findActive(fileId, key);
+
+            if (!fileMetaData) {
+                return Handle.response(res).fail('file_not_found', 404);
+            }
+
+            fileMetaData.recordState = 1;
+            await fileMetaData.save();
+
+            return Handle.response(res).success(fileMetaData);
+        } catch (ex) {
+            Handle.catch(ex).respond(res, next);
         }
     }
 
@@ -66,14 +106,12 @@ class FileService extends Service {
             const fileMetaData = await FileModel.findActive(fileId, key);
 
             if (!fileMetaData) {
-                return this.app.utils.handleErrorResponse(404, [{
-                    keyword: 'file_not_found'
-                }]);
+                return Handle.response(res).fail('file_not_found', 404);
             }
 
-            this.app.utils.handleSuccessResponse(fileMetaData, res);
-        } catch (error) {
-            next(error);
+            return Handle.response(res).success(fileMetaData);
+        } catch (ex) {
+            Handle.catch(ex).respond(res, next);
         }
     }
 
@@ -346,7 +384,7 @@ class FileService extends Service {
         return cropObj[crop];
     }
 
-    async _saveFile(file, key) {
+    async _saveFile(file, key, commit) {
         const FileModel = this.app.mongodb.models.File;
         const fileStorageInfo = await this._prepareStorage(file.originalFilename, file.size);
 
@@ -369,12 +407,11 @@ class FileService extends Service {
                 size: file.size,
                 path: folderPath,
                 key: key,
-                recordState: 0
+                recordState: commit ? 1 : 0
             });
 
             return await fileDB.save();
         } catch (ex) {
-            console.log(ex);
             throw this.app.utils.createError(400, [{ keyword: 'ERROR_WHILE_SAVING_FILE_IN_DB' }]);
         }
     }
@@ -448,7 +485,6 @@ class FileService extends Service {
 
             return result;
         } catch (error) {
-            console.log('error', error)
             return null;
         }
     }
