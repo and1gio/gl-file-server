@@ -41,34 +41,6 @@ class DataTransferJobInitializer extends Initializer {
             });
 
         }, 3000);
-
-
-
-
-        // 5bf817c1910dc205021a5108 - not found
-        //5bf826750354232936e78d98
-
-        /*
-        const file = await OldFileModel.get('5bf826750354232936e78d98');
-        const newFile = new NewFileModel({
-            _id: file._id,
-            fsName: file.name,
-            originalName: file.originalName,
-            storageId: file.storageId,
-            mimeType: file.mimeType,
-            encoding: file.encoding,
-            size: file.size,
-            key: file.key,
-            createdAt: file.createdAt,
-            lastReadAt: null,
-            recordState: 1
-        });
-
-        await newFile.save();
-
-        file.isSynced = true;
-        await file.save();
-        */
     }
 
     async _sync(OldFileModel, NewFileModel, files, count) {

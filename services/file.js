@@ -30,6 +30,10 @@ class FileService extends Service {
             }
 
             const record = await this._saveFile(file, key);
+
+            // TEMPORARY - Remove after we completly move to new FS Storage Server
+            await this._saveFileIntoOldStorage(record);
+
             return this.app.utils.handleSuccessResponse(record, res);
         } catch (error) {
             next(error);
@@ -47,6 +51,10 @@ class FileService extends Service {
             }
 
             const record = await this._saveFile(file, key, true);
+
+            // TEMPORARY - Remove after we completly move to new FS Storage Server
+            await this._saveFileIntoOldStorage(record);
+
             return this.app.utils.handleSuccessResponse(record, res);
         } catch (error) {
             next(error);
@@ -488,6 +496,42 @@ class FileService extends Service {
             return null;
         }
     }
+
+    /**
+     * TEMP
+     */
+    async _saveFileIntoOldStorage(fileMetaData) {
+        const FileModel = this.app.dataTransferJob.models.File;
+
+        const file = new FileModel({
+            _id: fileMetaData._id,
+            storageId: fileMetaData.storageId,
+            originalName: fileMetaData.originalName,
+            name: fileMetaData.fsName,
+            filePath: fileMetaData.storageId + fileMetaData._id,
+            size: fileMetaData.size,
+            path: this.__splitObjectId(fileMetaData._id),
+            recordState: 1,
+            createdAt: fileMetaData.createdAt,
+            key: fileMetaData.key,
+            encoding: fileMetaData.encoding,
+            mimeType: fileMetaData.mimeType,
+            isSynced: true
+        });
+
+        console.log(file);
+
+        return await file.save();
+    }
+
+    __splitObjectId (objectId) {
+        var id = objectId.toString();
+        var path = "";
+        for (var i = 0; i < id.length; i += 4) {
+            path += id.slice(i, i + 4) + "/";
+        }
+        return path;
+    };
 }
 
 module.exports = FileService;
