@@ -1,6 +1,3 @@
-
-'use strict';
-
 const ZAppCore = require('@and1gio/z-app-core');
 
 async function start() {
