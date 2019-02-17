@@ -1,5 +1,3 @@
-'use strict';
-
 const Middleware = require('@and1gio/z-app-core').Middleware;
 const Handle = require('@and1gio/z-app-core').Handle;
 

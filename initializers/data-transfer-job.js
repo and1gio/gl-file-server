@@ -1,5 +1,3 @@
-'use strict';
-
 const Initializer = require('@and1gio/z-app-core').Initializer;
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
@@ -13,6 +11,8 @@ class DataTransferJobInitializer extends Initializer {
 
     async init() {
         const connection = await this._openConnection();
+
+        this.isProcessing = false;
 
         this.app.dataTransferJob = {
             mongoose: mongoose,
@@ -29,21 +29,24 @@ class DataTransferJobInitializer extends Initializer {
             const OldFileModel = this.app.dataTransferJob.models.File;
             const NewFileModel = this.app.mongodb.models.File;
 
-            let count = await OldFileModel.countSynced();
-            console.log('Synced: ', count);
-
             schedule.scheduleJob('*/10 * * * * *', async () => {
+                if(this.isProcessing) return;
+
+                this.isProcessing = true;
+
                 let count = await OldFileModel.countNonSynced();
                 console.log('Items to sync: ', count);
 
                 let files = await OldFileModel.findNonSynced(1000);
-                await this._sync(OldFileModel, NewFileModel, files, 1000);
+                await this._sync(NewFileModel, files);
+
+                this.isProcessing = false;
             });
 
-        }, 3000);
+        }, 1000);
     }
 
-    async _sync(OldFileModel, NewFileModel, files, count) {
+    async _sync(NewFileModel, files) {
         console.log("Gonna sync next: ", files.length);
 
         let startTime = new Date().getTime();
@@ -73,13 +76,7 @@ class DataTransferJobInitializer extends Initializer {
         }
 
         const diff = new Date().getTime() - startTime;
-        console.log(count, "part done!! in millis: ", diff / 1000);
-
-        let nextFiles = await OldFileModel.findNonSynced(count);
-        if (nextFiles && nextFiles.length > 0) {
-            console.log("preparing for next part!!");
-            await this._sync(OldFileModel, NewFileModel, nextFiles, count);
-        }
+        console.log(files.length, "done!! in millis: ", diff / 1000);
     }
 
     async _openConnection() {

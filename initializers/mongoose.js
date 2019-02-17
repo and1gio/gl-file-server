@@ -1,5 +1,3 @@
-'use strict';
-
 const Initializer = require('@and1gio/z-app-core').Initializer;
 
 const mongoose = require('mongoose');

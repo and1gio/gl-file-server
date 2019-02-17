@@ -85,7 +85,7 @@ class FileService extends Service {
 
     async downloadFile(req, res, next) {
         try {
-            const key = req.headers.key || 'Joni'; // TODO .. test remove
+            const key = req.headers.key || req.query.key;
             const fileId = req.params.fileId;
 
             const FileModel = this.app.mongodb.models.File;
@@ -131,8 +131,12 @@ class FileService extends Service {
              * Phase 1 - check file existance
              */
             console.log('Phase 1');
-            const key = req.headers.key || 'Joni'; // TODO .. test remove
+            const key = req.headers.key || req.query.key;
             const fileId = req.params.fileId;
+
+            const width = +req.headers.width || +req.query.width;
+            const height = +req.headers.height || +req.query.height;
+            const crop = req.headers.crop || req.query.crop;
 
             const FileModel = this.app.mongodb.models.File;
             const fileMetaData = await FileModel.findActive(fileId, key);
@@ -147,7 +151,7 @@ class FileService extends Service {
             console.log('Phase 2');
             let isThumbnailRequest = false;
 
-            if (req.query.width || req.query.height) {
+            if (width || height) {
                 isThumbnailRequest = true;
             }
 
@@ -176,9 +180,9 @@ class FileService extends Service {
                 }
 
                 const imageTransformParams = {
-                    width: req.query.width || null,
-                    height: req.query.height || null,
-                    crop: req.query.crop || null
+                    width: width || null,
+                    height: height || null,
+                    crop: crop || null
                 };
 
                 // check thumbnail existance in db
@@ -504,9 +508,9 @@ class FileService extends Service {
      * TEMP
      */
     async _saveFileIntoOldStorage(fileMetaData) {
-        const FileModel = this.app.dataTransferJob.models.File;
+        const OldFileModel = this.app.dataTransferJob.models.File;
 
-        const file = new FileModel({
+        const file = new OldFileModel({
             _id: fileMetaData._id,
             storageId: fileMetaData.storageId,
             originalName: fileMetaData.originalName,

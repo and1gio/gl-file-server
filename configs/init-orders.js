@@ -1,5 +1,3 @@
-'use strict';
-
 exports.default = [
     { type: 'core', name: 'express', enabled: true },
     { type: 'app', name: 'validator', enabled: false },

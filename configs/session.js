@@ -1,5 +1,3 @@
-'use strict';
-
 const HOUR = 3600000;
 const DAY = HOUR * 24;
 

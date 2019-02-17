@@ -1,5 +1,3 @@
-'use strict';
-
 const Route = require('@and1gio/z-app-core').Route;
 const multipart = require('connect-multiparty');
 const multipartMiddleware = multipart({ maxFilesSize: '500MB' });
