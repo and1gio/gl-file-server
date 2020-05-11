@@ -21,8 +21,8 @@ exports.staging = function (app) {
 exports.production = function (app) {
     return {
         errorsClient: {
-            host: 'bl.msda.ge',
-            port: '3033',
+            host: 'errors.msda.ge',
+            port: '80',
             path: '/api/'
         }
     }

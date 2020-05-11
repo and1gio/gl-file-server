@@ -23,8 +23,8 @@ exports.staging = function( app ){
 exports.production = function( app ){
     return {
         translateClient: {
-            host:      'bl.msda.ge',
-            port:      '3032',
+            host:      'translations.msda.ge',
+            port:      '80',
             path:      '/api/',
             languages: [ "ge", "en" ]
         }

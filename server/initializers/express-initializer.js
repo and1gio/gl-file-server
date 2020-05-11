@@ -11,7 +11,7 @@ module.exports = {
 
         app.cookieParser = cookieParser();
 
-        app.express.use(logger('dev'));
+        //app.express.use(logger('dev'));
         app.express.use(bodyParser.json({limit: '2048mb'}));
         app.express.use(bodyParser.urlencoded({extended: false, limit: '2048mb'}));
         app.express.use(app.cookieParser);
