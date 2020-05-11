@@ -121,7 +121,7 @@ module.exports = function (app) {
         }
 
         if (errorKeywords.length > 0) {
-            return cb(app.errorsClient.getError(errorKeywords), null);
+            return cb([{ keyword: errorKeywords[0] }], null);
         }
 
         getFilePathById(fileId, key, function (err, res) {
@@ -158,7 +158,7 @@ module.exports = function (app) {
         }
 
         if (errorKeywords.length > 0) {
-            return cb(app.errorsClient.getError(errorKeywords), null);
+            return cb([{ keyword: errorKeywords[0] }], null);
         }
 
         getFilePathById(fileId, key, function (err, res) {
@@ -204,7 +204,7 @@ module.exports = function (app) {
         var key = req.body.key || null;
 
         if (!fileId) {
-            return cb({keyword: "FILE_ID_REQUIRED"}, null);
+            return cb([{keyword: "FILE_ID_REQUIRED"}], null);
         }
 
 
